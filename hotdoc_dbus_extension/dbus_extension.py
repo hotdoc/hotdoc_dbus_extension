@@ -1,16 +1,14 @@
 import os
 
 from hotdoc.core.base_extension import BaseExtension
-from hotdoc.utils.loggable import Loggable, progress_bar
 from dbusapi.interfaceparser import InterfaceParser
 from hotdoc.core.symbols import *
 from hotdoc.core.naive_index import NaiveIndexFormatter
 from hotdoc.core.gi_raw_parser import GtkDocRawCommentParser
 
 
-class DBusScanner(Loggable):
+class DBusScanner(object):
     def __init__(self, doc_tool, sources):
-        Loggable.__init__(self)
         self.__current_filename = None
         self.symbols = {}
         self.doc_tool = doc_tool
@@ -26,7 +24,6 @@ class DBusScanner(Loggable):
                     self.__create_property_symbol (prop)
                 for sname, signal in interface.signals.iteritems():
                     self.__create_signal_symbol (signal)
-        #nif = NaiveIndexFormatter(self.symbols)
 
     def __create_parameters (self, nodes, comment, omit_direction=False):
         parameters = []
