@@ -211,7 +211,7 @@ class DBusExtension(BaseExtension):
     def dbus_index_handler(self, doc_tree):
         index_path = os.path.join(doc_tree.prefix, self.dbus_index)
         doc_tree.build_tree(index_path, self.EXTENSION_NAME)
-        return index_path
+        return index_path, ''
 
 def get_extension_classes():
     return [DBusExtension]
