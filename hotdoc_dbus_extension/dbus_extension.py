@@ -62,7 +62,6 @@ class DBusScanner(object):
                 display_name=node.name,
                 filename=self.__current_filename,
                 unique_name=unique_name)
-        print "Created function symbol"
 
     def __create_class_symbol (self, node):
         self.__current_class_name = node.name
@@ -183,7 +182,6 @@ class DBusExtension(BaseExtension):
                 self.dbus_index_handler)
 
     def setup (self):
-        print "setting up", self.sources
         if not self.sources:
             return
 
