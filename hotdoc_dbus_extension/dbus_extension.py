@@ -187,7 +187,10 @@ class DBusExtension(BaseExtension):
         if not self.sources:
             return
 
-        self.scanner = DBusScanner (self.doc_tool, self.sources)
+        self.scanner = DBusScanner (self.doc_tool, self.stale_source_files)
+
+    def get_source_files(self):
+        return self.sources
 
     @staticmethod
     def add_arguments (parser):
