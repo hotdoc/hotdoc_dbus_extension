@@ -182,10 +182,12 @@ class DBusExtension(BaseExtension):
                 self.dbus_index_handler)
 
     def setup (self):
-        if not self.sources:
+        stale, unlisted = self.get_stale_files(self.sources)
+
+        if not stale:
             return
 
-        self.scanner = DBusScanner (self.doc_tool, self.stale_source_files)
+        self.scanner = DBusScanner (self.doc_tool, stale)
 
     def get_source_files(self):
         return self.sources
