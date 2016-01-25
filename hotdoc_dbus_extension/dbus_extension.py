@@ -5,7 +5,7 @@ from dbusapi.interfaceparser import InterfaceParser
 from dbusapi.ast import Commentable
 
 from hotdoc.core.base_extension import BaseExtension
-from hotdoc.core.doc_tool import HotdocWizard
+from hotdoc.core.wizard import HotdocWizard
 from hotdoc.utils.wizard import QuickStartWizard
 from hotdoc.core.symbols import *
 from hotdoc.core.naive_index import NaiveIndexFormatter
