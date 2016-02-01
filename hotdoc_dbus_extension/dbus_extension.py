@@ -12,10 +12,11 @@ from hotdoc.core.naive_index import NaiveIndexFormatter
 from hotdoc.core.gi_raw_parser import GtkDocRawCommentParser
 
 class DBusScanner(object):
-    def __init__(self, doc_tool, sources):
+    def __init__(self, doc_tool, doc_db, sources):
         self.__current_filename = None
         self.symbols = {}
         self.doc_tool = doc_tool
+        self.__doc_db = doc_db
         self.__raw_comment_parser = GtkDocRawCommentParser(self.doc_tool)
         for filename in sources:
             self.__current_filename = filename
@@ -56,7 +57,7 @@ class DBusScanner(object):
         parameters = self.__create_parameters (node.arguments, comment)
 
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        self.doc_tool.get_or_create_symbol(FunctionSymbol,
+        self.__doc_db.get_or_create_symbol(FunctionSymbol,
                 parameters=parameters,
                 comment=comment,
                 display_name=node.name,
@@ -68,7 +69,7 @@ class DBusScanner(object):
         comment = '\n'.join([l.strip() for l in node.comment.split('\n')])
         comment = self.__raw_comment_parser.parse_comment (comment,
                 self.__current_filename, 0, 0, stripped = True)
-        self.doc_tool.get_or_create_symbol(ClassSymbol,
+        self.__doc_db.get_or_create_symbol(ClassSymbol,
                 comment=comment,
                 display_name=node.name,
                 filename=self.__current_filename)
@@ -89,7 +90,7 @@ class DBusScanner(object):
             flags = 'Read / Write'
 
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        sym = self.doc_tool.get_or_create_symbol(PropertySymbol,
+        sym = self.__doc_db.get_or_create_symbol(PropertySymbol,
                 prop_type=type_, comment=comment,
                 display_name=node.name,
                 unique_name=unique_name,
@@ -107,7 +108,7 @@ class DBusScanner(object):
                 omit_direction=True)
 
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        self.doc_tool.get_or_create_symbol(SignalSymbol,
+        self.__doc_db.get_or_create_symbol(SignalSymbol,
                 parameters=parameters, comment=comment,
                 display_name=node.name, unique_name=unique_name,
                 filename=self.__current_filename)
@@ -187,7 +188,7 @@ class DBusExtension(BaseExtension):
         if not stale:
             return
 
-        self.scanner = DBusScanner (self.doc_tool, stale)
+        self.scanner = DBusScanner (self.doc_tool, self, stale)
 
     def get_source_files(self):
         return self.sources
