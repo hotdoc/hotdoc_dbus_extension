@@ -5,6 +5,7 @@ from dbusapi.interfaceparser import InterfaceParser
 from dbusapi.ast import Commentable
 
 from hotdoc.core.base_extension import BaseExtension
+from hotdoc.core.file_includer import find_md_file
 from hotdoc.core.wizard import HotdocWizard
 from hotdoc.utils.wizard import QuickStartWizard
 from hotdoc.core.symbols import *
@@ -213,7 +214,7 @@ class DBusExtension(BaseExtension):
                 finalize_function=HotdocWizard.finalize_path)
 
     def dbus_index_handler(self, doc_tree):
-        index_path = os.path.join(doc_tree.prefix, self.dbus_index)
+        index_path = find_md_file(self.dbus_index, self.doc_tool.include_paths)
         return index_path, '', 'dbus-extension'
 
 def get_extension_classes():
