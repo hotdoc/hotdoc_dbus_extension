@@ -7,10 +7,10 @@ from dbusapi.ast import Commentable
 from hotdoc.core.base_extension import BaseExtension
 from hotdoc.core.file_includer import find_md_file
 from hotdoc.core.wizard import HotdocWizard
-from hotdoc.utils.wizard import QuickStartWizard
 from hotdoc.core.symbols import *
 from hotdoc.core.naive_index import NaiveIndexFormatter
-from hotdoc.core.gi_raw_parser import GtkDocRawCommentParser
+from hotdoc.parsers.gtk_doc_parser import GtkDocParser
+from hotdoc.utils.wizard import QuickStartWizard
 
 class DBusScanner(object):
     def __init__(self, doc_tool, doc_db, sources):
@@ -18,7 +18,7 @@ class DBusScanner(object):
         self.symbols = {}
         self.doc_tool = doc_tool
         self.__doc_db = doc_db
-        self.__raw_comment_parser = GtkDocRawCommentParser(self.doc_tool)
+        self.__raw_comment_parser = GtkDocParser(self.doc_tool)
         for filename in sources:
             self.__current_filename = filename
             ip = InterfaceParser(filename)
