@@ -8,17 +8,16 @@ from hotdoc.core.base_extension import BaseExtension
 from hotdoc.core.file_includer import find_md_file
 from hotdoc.core.wizard import HotdocWizard
 from hotdoc.core.symbols import *
-from hotdoc.core.naive_index import NaiveIndexFormatter
 from hotdoc.parsers.gtk_doc_parser import GtkDocParser
 from hotdoc.utils.wizard import QuickStartWizard
 
 class DBusScanner(object):
-    def __init__(self, doc_tool, doc_db, sources):
+    def __init__(self, doc_repo, doc_db, sources):
         self.__current_filename = None
         self.symbols = {}
-        self.doc_tool = doc_tool
+        self.doc_repo = doc_repo
         self.__doc_db = doc_db
-        self.__raw_comment_parser = GtkDocParser(self.doc_tool)
+        self.__raw_comment_parser = GtkDocParser(self.doc_repo)
         for filename in sources:
             self.__current_filename = filename
             ip = InterfaceParser(filename)
@@ -175,12 +174,12 @@ def source_files_from_config(config, conf_path_resolver):
 class DBusExtension(BaseExtension):
     EXTENSION_NAME = 'dbus-extension'
 
-    def __init__(self, doc_tool, config):
-        BaseExtension.__init__(self, doc_tool, config)
-        self.sources = source_files_from_config(config, doc_tool)
+    def __init__(self, doc_repo, config):
+        BaseExtension.__init__(self, doc_repo, config)
+        self.sources = source_files_from_config(config, doc_repo)
         self.dbus_index = config.get('dbus_index')
 
-        doc_tool.doc_tree.page_parser.register_well_known_name ('dbus-api',
+        doc_repo.doc_tree.page_parser.register_well_known_name ('dbus-api',
                 self.dbus_index_handler)
 
     def setup (self):
@@ -189,7 +188,7 @@ class DBusExtension(BaseExtension):
         if not stale:
             return
 
-        self.scanner = DBusScanner (self.doc_tool, self, stale)
+        self.scanner = DBusScanner (self.doc_repo, self, stale)
 
     def get_source_files(self):
         return self.sources
@@ -214,7 +213,7 @@ class DBusExtension(BaseExtension):
                 finalize_function=HotdocWizard.finalize_path)
 
     def dbus_index_handler(self, doc_tree):
-        index_path = find_md_file(self.dbus_index, self.doc_tool.include_paths)
+        index_path = find_md_file(self.dbus_index, self.doc_repo.include_paths)
         return index_path, '', 'dbus-extension'
 
 def get_extension_classes():
