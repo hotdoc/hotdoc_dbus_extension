@@ -50,13 +50,13 @@ class DBusScanner(object):
         return parameters
 
     def __create_function_symbol (self, node):
+        unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = '\n'.join([l.strip() for l in node.comment.split('\n')])
         comment = self.__raw_comment_parser.parse_comment (comment,
                 self.__current_filename, 0, 0, stripped=True)
 
         parameters = self.__create_parameters (node.arguments, comment)
 
-        unique_name = '%s.%s' % (self.__current_class_name, node.name)
         self.__doc_db.get_or_create_symbol(FunctionSymbol,
                 parameters=parameters,
                 comment=comment,
@@ -157,6 +157,9 @@ def validate_filters(wizard, thing):
     return wizard.ask_confirmation()
 
 def resolve_patterns(source_patterns, conf_path_resolver):
+    if source_patterns is None:
+        return []
+
     source_files = []
     for item in source_patterns:
         item = conf_path_resolver.resolve_config_path(item)
@@ -198,12 +201,12 @@ class DBusExtension(BaseExtension):
         group = parser.add_argument_group('DBus extension',
                 DESCRIPTION)
         group.add_argument ("--dbus-sources", action="store", nargs="+",
-                dest="dbus_sources", help="Python source files to parse",
+                dest="dbus_sources", help="DBus source files to parse",
                 extra_prompt=DBUS_SOURCES_PROMPT,
                 validate_function=QuickStartWizard.validate_globs_list,
                 finalize_function=HotdocWizard.finalize_paths)
         group.add_argument ("--dbus-source-filters", action="store", nargs="+",
-                dest="dbus_source_filters", help="Python source files to ignore",
+                dest="dbus_source_filters", help="DBus source files to ignore",
                 extra_prompt=DBUS_FILTERS_PROMPT,
                 validate_function=validate_filters,
                 finalize_function=HotdocWizard.finalize_paths)
