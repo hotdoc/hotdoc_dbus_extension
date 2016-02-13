@@ -174,25 +174,21 @@ def source_files_from_config(config, conf_path_resolver):
 
 class DBusExtension(BaseExtension):
     EXTENSION_NAME = 'dbus-extension'
+    sources = None
+    index = None
 
-    def __init__(self, doc_repo, config):
-        BaseExtension.__init__(self, doc_repo, config)
-        self.sources = source_files_from_config(config, doc_repo)
-        self.dbus_index = config.get('dbus_index')
-
+    def __init__(self, doc_repo):
+        BaseExtension.__init__(self, doc_repo)
         doc_repo.doc_tree.page_parser.register_well_known_name ('dbus-api',
                 self.dbus_index_handler)
 
     def setup (self):
-        stale, unlisted = self.get_stale_files(self.sources)
+        stale, unlisted = self.get_stale_files(DBusExtension.sources)
 
         if not stale:
             return
 
         self.scanner = DBusScanner (self.doc_repo, self, stale)
-
-    def get_source_files(self):
-        return self.sources
 
     @staticmethod
     def add_arguments (parser):
@@ -213,8 +209,13 @@ class DBusExtension(BaseExtension):
                 help="Name of the dbus root markdown file",
                 finalize_function=HotdocWizard.finalize_path)
 
+    @staticmethod
+    def parse_config(doc_repo, config):
+        DBusExtension.sources = source_files_from_config(config, doc_repo)
+        DBusExtension.index = config.get('dbus_index')
+
     def dbus_index_handler(self, doc_tree):
-        index_path = find_md_file(self.dbus_index, self.doc_repo.include_paths)
+        index_path = find_md_file(self.index, self.doc_repo.include_paths)
         return index_path, '', 'dbus-extension'
 
 def get_extension_classes():
