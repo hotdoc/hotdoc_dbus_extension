@@ -8,6 +8,7 @@ from hotdoc.core.wizard import HotdocWizard
 from hotdoc.core.symbols import *
 from hotdoc.parsers.gtk_doc_parser import GtkDocParser
 from hotdoc.utils.wizard import QuickStartWizard
+from hotdoc.utils.loggable import warn
 
 class DBusScanner(object):
     def __init__(self, doc_repo, doc_db, sources):
@@ -215,7 +216,13 @@ class DBusExtension(BaseExtension):
         DBusExtension.index = config.get('dbus_index')
 
     def dbus_index_handler(self, doc_tree):
-        index_path = find_md_file(self.index, self.doc_repo.include_paths)
+        if not DBusExtension.index:
+            warn('parsing-issue',
+                 'Well-known-name dbus-index encountered, but "dbus_index" is '
+                 'missing')
+            return None
+        index_path = find_md_file(DBusExtension.index,
+                                  self.doc_repo.include_paths)
         return index_path, '', 'dbus-extension'
 
 def get_extension_classes():
