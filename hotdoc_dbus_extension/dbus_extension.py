@@ -1,8 +1,6 @@
 import os, glob
 
 from dbusapi.interfaceparser import InterfaceParser
-# Check if dbusapi is recent enough
-from dbusapi.ast import Commentable
 
 from hotdoc.core.base_extension import BaseExtension
 from hotdoc.core.file_includer import find_md_file

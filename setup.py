@@ -13,6 +13,6 @@ setup(
     packages = find_packages(),
     entry_points = {'hotdoc.extensions': 'get_extension_classes = hotdoc_dbus_extension.dbus_extension:get_extension_classes'},
     install_requires = [
-        'dbus-deviation>=0.3.0',
+        'dbus-deviation>=0.4.0',
     ]
 )
