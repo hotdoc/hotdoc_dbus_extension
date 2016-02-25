@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name = "hotdoc_dbus_extension",
-    version = "0.6.9.1",
+    version = "0.7",
     keywords = "DBus hotdoc dbus-deviation",
     url='https://github.com/hotdoc/hotdoc_dbus_extension',
     author_email = 'mathieu.duponchelle@opencreed.com',
