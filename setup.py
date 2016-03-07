@@ -16,11 +16,16 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with this library.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
+
 from setuptools import setup, find_packages
+
+with open(os.path.join('hotdoc_dbus_extension', 'VERSION.txt'), 'r') as _:
+    VERSION = _.read().strip()
 
 setup(
     name = "hotdoc_dbus_extension",
-    version = "0.7",
+    version = VERSION,
     keywords = "DBus hotdoc dbus-deviation",
     url='https://github.com/hotdoc/hotdoc_dbus_extension',
     author_email = 'mathieu.duponchelle@opencreed.com',
@@ -29,6 +34,7 @@ setup(
                    " dbus-deviation"),
     author = "Mathieu Duponchelle",
     packages = find_packages(),
+    package_data = {'hotdoc_dbus_extension': ['VERSION.txt']},
     entry_points = {'hotdoc.extensions': 'get_extension_classes = hotdoc_dbus_extension.dbus_extension:get_extension_classes'},
     install_requires = [
         'dbus-deviation>=0.4.0',
