@@ -22,10 +22,8 @@ from dbusapi.interfaceparser import InterfaceParser
 
 from hotdoc.core.base_extension import BaseExtension
 from hotdoc.core.file_includer import find_md_file
-from hotdoc.core.wizard import HotdocWizard
 from hotdoc.core.symbols import *
 from hotdoc.parsers.gtk_doc_parser import GtkDocParser
-from hotdoc.utils.wizard import QuickStartWizard
 from hotdoc.utils.loggable import warn
 
 class DBusScanner(object):
@@ -135,66 +133,10 @@ DESCRIPTION=\
 Parse DBus XML files and extract symbols and comments.
 """
 
-DBUS_SOURCES_PROMPT=\
-"""
-Please pass a list of dbus source files.
-
-You can pass wildcards here, for example:
-
->>> ['../foo/*.xml', '../foo//bar/*.xml]
-
-These wildcards will be evaluated each time hotdoc is run.
-
-You will be prompted for source files to ignore afterwards.
-"""
-
-DBUS_FILTERS_PROMPT=\
-"""
-Please pass a list of dbus source files to ignore.
-
-You can pass wildcards here, for example:
-
->>> ['../foo/*priv*.xml']
-
-These wildcards will be evaluated each time hotdoc is run.
-"""
-
-def validate_filters(wizard, thing):
-    if not QuickStartWizard.validate_globs_list(wizard, thing):
-        return False
-
-    source_files = resolve_patterns(wizard.config.get('dbus_sources', []), wizard)
-
-    filters = resolve_patterns(thing, wizard)
-
-    source_files = [item for item in source_files if item not in filters]
-
-    print "The files to be parsed would now be %s" % source_files
-
-    return wizard.ask_confirmation()
-
-def resolve_patterns(source_patterns, conf_path_resolver):
-    if source_patterns is None:
-        return []
-
-    source_files = []
-    for item in source_patterns:
-        item = conf_path_resolver.resolve_config_path(item)
-        source_files.extend(glob.glob(item))
-
-    return source_files
-
-def source_files_from_config(config, conf_path_resolver):
-    sources = resolve_patterns(config.get('dbus_sources', []), conf_path_resolver)
-    filters = resolve_patterns(config.get('dbus_source_filters', []),
-            conf_path_resolver)
-    sources = [item for item in sources if item not in filters]
-    return [os.path.abspath(source) for source in sources]
 
 class DBusExtension(BaseExtension):
     EXTENSION_NAME = 'dbus-extension'
-    sources = None
-    index = None
+    argument_prefix = 'dbus'
 
     def __init__(self, doc_repo):
         BaseExtension.__init__(self, doc_repo)
@@ -213,25 +155,12 @@ class DBusExtension(BaseExtension):
     def add_arguments (parser):
         group = parser.add_argument_group('DBus extension',
                 DESCRIPTION)
-        group.add_argument ("--dbus-sources", action="store", nargs="+",
-                dest="dbus_sources", help="DBus source files to parse",
-                extra_prompt=DBUS_SOURCES_PROMPT,
-                validate_function=QuickStartWizard.validate_globs_list,
-                finalize_function=HotdocWizard.finalize_paths)
-        group.add_argument ("--dbus-source-filters", action="store", nargs="+",
-                dest="dbus_source_filters", help="DBus source files to ignore",
-                extra_prompt=DBUS_FILTERS_PROMPT,
-                validate_function=validate_filters,
-                finalize_function=HotdocWizard.finalize_paths)
-        group.add_argument ("--dbus-index", action="store",
-                dest="dbus_index",
-                help="Name of the dbus root markdown file",
-                finalize_function=HotdocWizard.finalize_path)
+        DBusExtension.add_index_argument(group, smart=False)
+        DBusExtension.add_sources_argument(group)
 
     @staticmethod
     def parse_config(doc_repo, config):
-        DBusExtension.sources = source_files_from_config(config, doc_repo)
-        DBusExtension.index = config.get('dbus_index')
+        DBusExtension.parse_standard_config(config)
 
     def dbus_index_handler(self, doc_tree):
         if not DBusExtension.index:
