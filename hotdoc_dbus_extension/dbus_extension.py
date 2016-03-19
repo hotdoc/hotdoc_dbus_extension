@@ -151,6 +151,14 @@ class DBusExtension(BaseExtension):
 
         self.scanner = DBusScanner (self.doc_repo, self, stale)
 
+    def get_or_create_symbol(self, *args, **kwargs):
+        kwargs['language'] = 'dbus'
+        return super(DBusExtension, self).get_or_create_symbol(*args,
+            **kwargs)
+
+    def _get_languages(self):
+        return ['dbus']
+
     @staticmethod
     def add_arguments (parser):
         group = parser.add_argument_group('DBus extension',
