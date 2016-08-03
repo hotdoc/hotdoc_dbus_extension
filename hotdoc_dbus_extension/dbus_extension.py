@@ -161,7 +161,7 @@ class DBusExtension(BaseExtension):
     def add_arguments (parser):
         group = parser.add_argument_group('DBus extension',
                 DESCRIPTION)
-        DBusExtension.add_index_argument(group, smart=False)
+        DBusExtension.add_index_argument(group)
         DBusExtension.add_sources_argument(group)
 
     @staticmethod
