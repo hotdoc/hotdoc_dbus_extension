@@ -66,12 +66,43 @@ class DBusScanner(object):
 
         return parameters
 
+    def __comment_from_node(self, node):
+        if node.comment is None:
+            return None
+
+        lineno = -1
+
+        lines = node.comment.split('\n')
+        stripped_lines = []
+        column_offset = 0
+        line_offset = 0
+        for l in lines:
+            nl = l.strip()
+            if not nl and not stripped_lines:
+                line_offset += 1
+                continue
+            if not column_offset and nl:
+                column_offset = len(l) - len(nl)
+            stripped_lines.append(nl)
+
+        if hasattr(node, 'comment_lineno'):
+            lineno = node.comment_lineno + line_offset
+
+        comment = u'\n'.join(stripped_lines)
+        comment = self.__raw_comment_parser.parse_comment (comment,
+                self.__current_filename, lineno,
+                -1, stripped=True)
+
+        if comment:
+            comment.col_offset = column_offset + 1
+            for param in comment.params.values():
+                param.col_offset = comment.col_offset
+
+        return comment
+
     def __create_function_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        comment = '\n'.join([l.strip() for l in node.comment.split('\n')])
-        comment = self.__raw_comment_parser.parse_comment (comment,
-                self.__current_filename, 0, 0, stripped=True)
-
+        comment = self.__comment_from_node(node)
         parameters = self.__create_parameters (node.arguments, comment)
 
         self.__doc_db.get_or_create_symbol(FunctionSymbol,
@@ -83,18 +114,14 @@ class DBusScanner(object):
 
     def __create_class_symbol (self, node):
         self.__current_class_name = node.name
-        comment = '\n'.join([l.strip() for l in node.comment.split('\n')])
-        comment = self.__raw_comment_parser.parse_comment (comment,
-                self.__current_filename, 0, 0, stripped = True)
+        comment = self.__comment_from_node(node)
         self.__doc_db.get_or_create_symbol(ClassSymbol,
                 comment=comment,
                 display_name=node.name,
                 filename=self.__current_filename)
 
     def __create_property_symbol (self, node):
-        comment = '\n'.join([l.strip() for l in node.comment.split('\n')])
-        comment = self.__raw_comment_parser.parse_comment (comment,
-                self.__current_filename, 0, 0, stripped = True)
+        comment = self.__comment_from_node(node)
         type_tokens = [node.type]
         type_ = QualifiedSymbol (type_tokens=type_tokens)
 
@@ -117,9 +144,7 @@ class DBusScanner(object):
             sym.extension_contents['Flags'] = flags
 
     def __create_signal_symbol (self, node):
-        comment = '\n'.join([l.strip() for l in node.comment.split('\n')])
-        comment = self.__raw_comment_parser.parse_comment (comment,
-                self.__current_filename, 0, 0, stripped=True)
+        comment = self.__comment_from_node(node)
 
         parameters = self.__create_parameters (node.arguments, comment,
                 omit_direction=True)
