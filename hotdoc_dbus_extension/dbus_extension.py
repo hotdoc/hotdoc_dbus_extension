@@ -29,11 +29,11 @@ from hotdoc.utils.loggable import warn
 from hotdoc_dbus_extension.dbus_html_formatter import DBusHtmlFormatter
 
 class DBusScanner(object):
-    def __init__(self, doc_repo, doc_db, sources):
+    def __init__(self, doc_repo, ext, sources):
         self.__current_filename = None
         self.symbols = {}
         self.doc_repo = doc_repo
-        self.__doc_db = doc_db
+        self.__ext = ext
         self.__raw_comment_parser = GtkDocParser(self.doc_repo)
         for filename in sources:
             self.__current_filename = filename
@@ -105,7 +105,7 @@ class DBusScanner(object):
         comment = self.__comment_from_node(node)
         parameters = self.__create_parameters (node.arguments, comment)
 
-        self.__doc_db.get_or_create_symbol(FunctionSymbol,
+        self.__ext.get_or_create_symbol(FunctionSymbol,
                 parameters=parameters,
                 comment=comment,
                 display_name=node.name,
@@ -115,7 +115,7 @@ class DBusScanner(object):
     def __create_class_symbol (self, node):
         self.__current_class_name = node.name
         comment = self.__comment_from_node(node)
-        self.__doc_db.get_or_create_symbol(ClassSymbol,
+        self.__ext.get_or_create_symbol(ClassSymbol,
                 comment=comment,
                 display_name=node.name,
                 filename=self.__current_filename)
@@ -134,7 +134,7 @@ class DBusScanner(object):
             flags = 'Read / Write'
 
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        sym = self.__doc_db.get_or_create_symbol(PropertySymbol,
+        sym = self.__ext.get_or_create_symbol(PropertySymbol,
                 prop_type=type_, comment=comment,
                 display_name=node.name,
                 unique_name=unique_name,
@@ -150,7 +150,7 @@ class DBusScanner(object):
                 omit_direction=True)
 
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        self.__doc_db.get_or_create_symbol(SignalSymbol,
+        self.__ext.get_or_create_symbol(SignalSymbol,
                 parameters=parameters, comment=comment,
                 display_name=node.name, unique_name=unique_name,
                 filename=self.__current_filename)
