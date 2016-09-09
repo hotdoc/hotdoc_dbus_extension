@@ -182,8 +182,8 @@ class DBusExtension(BaseExtension):
         return super(DBusExtension, self).get_or_create_symbol(*args,
             **kwargs)
 
-    def _get_languages(self):
-        return ['dbus']
+    def _get_smart_index_title(self):
+        return 'D-Bus API Reference'
 
     @staticmethod
     def add_arguments (parser):
