@@ -47,26 +47,21 @@ class DBusScanner(object):
                 for sname, signal in interface.signals.iteritems():
                     self.__create_signal_symbol (signal)
 
-    def __create_parameters (self, nodes, comment, omit_direction=False):
+    def __create_parameters (self, nodes, omit_direction=False):
         parameters = []
 
         for param in nodes:
-            if comment:
-                param_comment = comment.params.get (param.name)
-            else:
-                param_comment = None
-
             type_tokens = []
             if not omit_direction:
                 type_tokens.append (param.direction.upper() + ' ')
+
             type_tokens.append (param.type)
             parameters.append (ParameterSymbol (argname=param.name,
-                type_tokens=type_tokens,
-                comment=param_comment))
+                type_tokens=type_tokens))
 
         return parameters
 
-    def __comment_from_node(self, node):
+    def __comment_from_node(self, node, unique_name=None):
         if node.comment is None:
             return None
 
@@ -98,30 +93,36 @@ class DBusScanner(object):
             for param in comment.params.values():
                 param.col_offset = comment.col_offset
 
+        if unique_name and comment:
+            comment.name = unique_name
+
         return comment
 
     def __create_function_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
-        comment = self.__comment_from_node(node)
-        parameters = self.__create_parameters (node.arguments, comment)
+        comment = self.__comment_from_node(node, unique_name)
+        self.doc_repo.doc_database.add_comment(comment)
+        parameters = self.__create_parameters (node.arguments)
 
         self.__ext.get_or_create_symbol(FunctionSymbol,
                 parameters=parameters,
-                comment=comment,
                 display_name=node.name,
                 filename=self.__current_filename,
                 unique_name=unique_name)
 
     def __create_class_symbol (self, node):
         self.__current_class_name = node.name
-        comment = self.__comment_from_node(node)
+        comment = self.__comment_from_node(node, node.name)
+        self.doc_repo.doc_database.add_comment(comment)
         self.__ext.get_or_create_symbol(ClassSymbol,
-                comment=comment,
                 display_name=node.name,
                 filename=self.__current_filename)
 
     def __create_property_symbol (self, node):
-        comment = self.__comment_from_node(node)
+        unique_name = '%s.%s' % (self.__current_class_name, node.name)
+        comment = self.__comment_from_node(node, unique_name)
+        self.doc_repo.doc_database.add_comment(comment)
+
         type_tokens = [node.type]
         type_ = QualifiedSymbol (type_tokens=type_tokens)
 
@@ -133,9 +134,8 @@ class DBusScanner(object):
         elif node.access == node.ACCESS_READWRITE:
             flags = 'Read / Write'
 
-        unique_name = '%s.%s' % (self.__current_class_name, node.name)
         sym = self.__ext.get_or_create_symbol(PropertySymbol,
-                prop_type=type_, comment=comment,
+                prop_type=type_,
                 display_name=node.name,
                 unique_name=unique_name,
                 filename=self.__current_filename)
@@ -144,14 +144,15 @@ class DBusScanner(object):
             sym.extension_contents['Flags'] = flags
 
     def __create_signal_symbol (self, node):
-        comment = self.__comment_from_node(node)
+        unique_name = '%s.%s' % (self.__current_class_name, node.name)
+        comment = self.__comment_from_node(node, unique_name)
+        self.doc_repo.doc_database.add_comment(comment)
 
-        parameters = self.__create_parameters (node.arguments, comment,
+        parameters = self.__create_parameters (node.arguments,
                 omit_direction=True)
 
-        unique_name = '%s.%s' % (self.__current_class_name, node.name)
         self.__ext.get_or_create_symbol(SignalSymbol,
-                parameters=parameters, comment=comment,
+                parameters=parameters,
                 display_name=node.name, unique_name=unique_name,
                 filename=self.__current_filename)
 
