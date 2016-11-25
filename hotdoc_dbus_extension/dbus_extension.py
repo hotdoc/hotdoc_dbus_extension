@@ -38,13 +38,13 @@ class DBusScanner(object):
         for filename in sources:
             self.__current_filename = filename
             ip = InterfaceParser(filename)
-            for name, interface in ip.parse().iteritems():
+            for name, interface in ip.parse().items():
                 self.__create_class_symbol (interface)
-                for mname, method in interface.methods.iteritems():
+                for mname, method in interface.methods.items():
                     self.__create_function_symbol (method)
-                for pname, prop in interface.properties.iteritems():
+                for pname, prop in interface.properties.items():
                     self.__create_property_symbol (prop)
-                for sname, signal in interface.signals.iteritems():
+                for sname, signal in interface.signals.items():
                     self.__create_signal_symbol (signal)
 
     def __create_parameters (self, nodes, omit_direction=False):
@@ -90,7 +90,7 @@ class DBusScanner(object):
 
         if comment:
             comment.col_offset = column_offset + 1
-            for param in comment.params.values():
+            for param in list(comment.params.values()):
                 param.col_offset = comment.col_offset
 
         if unique_name and comment:
