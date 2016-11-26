@@ -101,7 +101,7 @@ class DBusScanner(object):
     def __create_function_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = self.__comment_from_node(node, unique_name)
-        self.doc_repo.doc_database.add_comment(comment)
+        self.doc_repo.database.add_comment(comment)
         parameters = self.__create_parameters (node.arguments)
 
         self.__ext.get_or_create_symbol(FunctionSymbol,
@@ -113,7 +113,7 @@ class DBusScanner(object):
     def __create_class_symbol (self, node):
         self.__current_class_name = node.name
         comment = self.__comment_from_node(node, node.name)
-        self.doc_repo.doc_database.add_comment(comment)
+        self.doc_repo.database.add_comment(comment)
         self.__ext.get_or_create_symbol(ClassSymbol,
                 display_name=node.name,
                 filename=self.__current_filename)
@@ -121,7 +121,7 @@ class DBusScanner(object):
     def __create_property_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = self.__comment_from_node(node, unique_name)
-        self.doc_repo.doc_database.add_comment(comment)
+        self.doc_repo.database.add_comment(comment)
 
         type_tokens = [node.type]
         type_ = QualifiedSymbol (type_tokens=type_tokens)
@@ -146,7 +146,7 @@ class DBusScanner(object):
     def __create_signal_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = self.__comment_from_node(node, unique_name)
-        self.doc_repo.doc_database.add_comment(comment)
+        self.doc_repo.database.add_comment(comment)
 
         parameters = self.__create_parameters (node.arguments,
                 omit_direction=True)
