@@ -26,7 +26,7 @@ from hotdoc.core.symbols import *
 from hotdoc.parsers.gtk_doc_parser import GtkDocParser
 from hotdoc.utils.loggable import warn
 
-from hotdoc_dbus_extension.dbus_html_formatter import DBusHtmlFormatter
+from hotdoc_dbus_extension.dbus_formatter import DBusFormatter
 
 class DBusScanner(object):
     def __init__(self, doc_repo, ext, sources):
@@ -168,7 +168,7 @@ class DBusExtension(BaseExtension):
 
     def __init__(self, doc_repo):
         BaseExtension.__init__(self, doc_repo)
-        self.formatters['html'] = DBusHtmlFormatter()
+        self.formatters['html'] = DBusFormatter()
 
     def setup (self):
         stale, unlisted = self.get_stale_files(DBusExtension.sources)
