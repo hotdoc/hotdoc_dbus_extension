@@ -20,7 +20,7 @@ import os, glob
 
 from dbusapi.interfaceparser import InterfaceParser
 
-from hotdoc.core.base_extension import BaseExtension
+from hotdoc.core.extension import Extension
 from hotdoc.core.file_includer import find_md_file
 from hotdoc.core.symbols import *
 from hotdoc.parsers.gtk_doc_parser import GtkDocParser
@@ -162,12 +162,12 @@ Parse DBus XML files and extract symbols and comments.
 """
 
 
-class DBusExtension(BaseExtension):
+class DBusExtension(Extension):
     extension_name = 'dbus-extension'
     argument_prefix = 'dbus'
 
     def __init__(self, doc_repo):
-        BaseExtension.__init__(self, doc_repo)
+        Extension.__init__(self, doc_repo)
         self.formatters['html'] = DBusFormatter()
 
     def setup (self):
