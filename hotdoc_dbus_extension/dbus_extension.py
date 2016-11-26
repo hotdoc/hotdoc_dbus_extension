@@ -29,12 +29,12 @@ from hotdoc.utils.loggable import warn
 from hotdoc_dbus_extension.dbus_formatter import DBusFormatter
 
 class DBusScanner(object):
-    def __init__(self, doc_repo, ext, sources):
+    def __init__(self, project, ext, sources):
         self.__current_filename = None
         self.symbols = {}
-        self.doc_repo = doc_repo
+        self.project = project
         self.__ext = ext
-        self.__raw_comment_parser = GtkDocParser(self.doc_repo)
+        self.__raw_comment_parser = GtkDocParser(self.project)
         for filename in sources:
             self.__current_filename = filename
             ip = InterfaceParser(filename)
@@ -101,7 +101,7 @@ class DBusScanner(object):
     def __create_function_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = self.__comment_from_node(node, unique_name)
-        self.doc_repo.database.add_comment(comment)
+        self.project.database.add_comment(comment)
         parameters = self.__create_parameters (node.arguments)
 
         self.__ext.get_or_create_symbol(FunctionSymbol,
@@ -113,7 +113,7 @@ class DBusScanner(object):
     def __create_class_symbol (self, node):
         self.__current_class_name = node.name
         comment = self.__comment_from_node(node, node.name)
-        self.doc_repo.database.add_comment(comment)
+        self.project.database.add_comment(comment)
         self.__ext.get_or_create_symbol(ClassSymbol,
                 display_name=node.name,
                 filename=self.__current_filename)
@@ -121,7 +121,7 @@ class DBusScanner(object):
     def __create_property_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = self.__comment_from_node(node, unique_name)
-        self.doc_repo.database.add_comment(comment)
+        self.project.database.add_comment(comment)
 
         type_tokens = [node.type]
         type_ = QualifiedSymbol (type_tokens=type_tokens)
@@ -146,7 +146,7 @@ class DBusScanner(object):
     def __create_signal_symbol (self, node):
         unique_name = '%s.%s' % (self.__current_class_name, node.name)
         comment = self.__comment_from_node(node, unique_name)
-        self.doc_repo.database.add_comment(comment)
+        self.project.database.add_comment(comment)
 
         parameters = self.__create_parameters (node.arguments,
                 omit_direction=True)
@@ -166,8 +166,8 @@ class DBusExtension(Extension):
     extension_name = 'dbus-extension'
     argument_prefix = 'dbus'
 
-    def __init__(self, doc_repo):
-        Extension.__init__(self, doc_repo)
+    def __init__(self, project):
+        Extension.__init__(self, project)
         self.formatters['html'] = DBusFormatter()
 
     def setup (self):
@@ -176,7 +176,7 @@ class DBusExtension(Extension):
         if not stale:
             return
 
-        self.scanner = DBusScanner (self.doc_repo, self, stale)
+        self.scanner = DBusScanner (self.project, self, stale)
 
     def get_or_create_symbol(self, *args, **kwargs):
         kwargs['language'] = 'dbus'
@@ -194,7 +194,7 @@ class DBusExtension(Extension):
         DBusExtension.add_sources_argument(group)
 
     @staticmethod
-    def parse_config(doc_repo, config):
+    def parse_config(project, config):
         DBusExtension.parse_standard_config(config)
 
 def get_extension_classes():
