@@ -21,7 +21,6 @@ import os, glob
 from dbusapi.interfaceparser import InterfaceParser
 
 from hotdoc.core.extension import Extension
-from hotdoc.core.file_includer import find_md_file
 from hotdoc.core.symbols import *
 from hotdoc.parsers.gtk_doc_parser import GtkDocParser
 from hotdoc.utils.loggable import warn
