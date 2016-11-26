@@ -22,7 +22,7 @@ from dbusapi.interfaceparser import InterfaceParser
 
 from hotdoc.core.extension import Extension
 from hotdoc.core.symbols import *
-from hotdoc.parsers.gtk_doc_parser import GtkDocParser
+from hotdoc.parsers.gtk_doc import GtkDocParser
 from hotdoc.utils.loggable import warn
 
 from hotdoc_dbus_extension.dbus_formatter import DBusFormatter
