@@ -54,7 +54,7 @@ class DBusScanner(object):
             if not omit_direction:
                 type_tokens.append (param.direction.upper() + ' ')
 
-            type_tokens.append (param.type)
+            type_tokens.append (str(param.type))
             parameters.append (ParameterSymbol (argname=param.name,
                 type_tokens=type_tokens))
 
@@ -122,7 +122,7 @@ class DBusScanner(object):
         comment = self.__comment_from_node(node, unique_name)
         self.app.database.add_comment(comment)
 
-        type_tokens = [node.type]
+        type_tokens = [str(node.type)]
         type_ = QualifiedSymbol (type_tokens=type_tokens)
 
         flags = ''
